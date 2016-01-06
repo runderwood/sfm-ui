@@ -1,4 +1,3 @@
-from abc import ABCMeta
 from django.contrib.auth.models import AbstractUser, Group
 from django.db import models
 from django.utils import timezone
@@ -65,9 +64,13 @@ class Seed(models.Model):
     class Meta:
         abstract = True
 
-    seed_set = models.ForeignKey(SeedSet, related_name='seeds')
-    token = models.TextField(blank=True)
-    uid = models.TextField(blank=True)
+    # We can't set the related_name to "seeds" because
+    # multiple subclasses inherit from Seed.  This would
+    # cause a clash in reverse query names / reverse accessors.
+    # See https://docs.djangoproject.com/en/1.8/topics/db/queries/#backwards-related-objects
+    seed_set = models.ForeignKey(SeedSet, related_name='+')
+    # token = models.TextField(blank=True)
+    # uid = models.TextField(blank=True)
     is_active = models.BooleanField(default=True)
     is_valid = models.BooleanField(default=True)
     stats = models.TextField(blank=True)
@@ -75,7 +78,12 @@ class Seed(models.Model):
     date_updated = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return '<Seed %s "%s">' % (self.id, self.token)
+        return '<Seed "%s">' % self.display_name  # Won't have id
+
+    # Implement this in subclasses
+    @property
+    def display_name(self):
+        return NotImplemented
 
 
 class Harvest(models.Model):
