@@ -1,3 +1,4 @@
+from abc import ABCMeta
 from django.contrib.auth.models import AbstractUser, Group
 from django.db import models
 from django.utils import timezone
@@ -60,6 +61,9 @@ class SeedSet(models.Model):
 
 @python_2_unicode_compatible
 class Seed(models.Model):
+
+    class Meta:
+        abstract = True
 
     seed_set = models.ForeignKey(SeedSet, related_name='seeds')
     token = models.TextField(blank=True)

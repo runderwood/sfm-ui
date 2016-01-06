@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'django.contrib.sites',
     'django.contrib.staticfiles',
     'ui',
+    'twitterui',
     'allauth',                      # registration
     'allauth.account',              # registration
     'allauth.socialaccount',        # registration
