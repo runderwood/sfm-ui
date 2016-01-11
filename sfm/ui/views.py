@@ -4,7 +4,6 @@ from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView, \
     FormView
 from django.views.generic.edit import ModelFormMixin
-from django.views.generic.base import ContextMixin
 from django.views.generic.list import ListView
 
 from braces.views import LoginRequiredMixin
@@ -82,16 +81,16 @@ class SeedSetDetailView(DetailView):
     template_name = 'ui/seedset_detail.html'
 
 
-class SeedSetCreateView(CreateView, ContextMixin):
+class SeedSetCreateView(CreateView):
     model = SeedSet
     form_class = SeedSetForm
     template_name = 'ui/seedset_create.html'
     success_url = reverse_lazy('seedset_list')
 
     def get_context_data(self, **kwargs):
-        seed_set_type = self.kwargs['seed_set_type']
-        # We can pass more here if we need
-        return {'seed_set_type': seed_set_type}
+        context = super(CreateView, self).get_context_data(**kwargs)
+        context['seed_set_type'] = self.kwargs['seed_set_type']
+        return context
 
 
 class SeedSetUpdateView(UpdateView):
