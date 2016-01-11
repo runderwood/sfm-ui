@@ -26,6 +26,11 @@ urlpatterns = patterns('',
                            name="collection_list"),
 
                        url(r'^seedsets/create/$',
+                           views.SeedSetSelectTypeView.as_view(),
+                           name="seedset_select_type"),
+
+                       url(r'^seedsets/create/(?P<seed_set_type>(?i)(%s)?)/$'
+                           % 'flickr_user|twitter_user|twitter_filter',
                            views.SeedSetCreateView.as_view(),
                            name="seedset_create"),
 

@@ -1,13 +1,16 @@
 from django.core.urlresolvers import reverse_lazy, reverse
 from django.db.models import Count
 from django.views.generic.detail import DetailView
-from django.views.generic.edit import CreateView, UpdateView, DeleteView
+from django.views.generic.edit import CreateView, UpdateView, DeleteView, \
+    FormView
 from django.views.generic.edit import ModelFormMixin
+from django.views.generic.base import ContextMixin
 from django.views.generic.list import ListView
 
 from braces.views import LoginRequiredMixin
 
-from .forms import CollectionForm, SeedSetForm, SeedForm, CredentialForm
+from .forms import CollectionForm, SeedSetForm, SeedForm, CredentialForm, \
+    SeedSetSelectTypeForm
 from .models import Collection, SeedSet, Seed, Credential
 from utils import schedule_harvest
 
@@ -55,6 +58,17 @@ class CollectionDeleteView(DeleteView):
     success_url = reverse_lazy('collection_list')
 
 
+class SeedSetSelectTypeView(FormView):
+    form_class = SeedSetSelectTypeForm
+    template_name = 'ui/seedset_type_select.html'
+
+    def form_valid(self, form):
+        seed_set_type = form.cleaned_data['seed_set_type']
+        self.success_url = reverse('seedset_create',
+                                   kwargs={'seed_set_type': seed_set_type})
+        return super(FormView, self).form_valid(form)
+
+
 class SeedSetListView(ListView):
     model = SeedSet
     template_name = 'ui/seedset_list.html'
@@ -68,11 +82,16 @@ class SeedSetDetailView(DetailView):
     template_name = 'ui/seedset_detail.html'
 
 
-class SeedSetCreateView(CreateView):
+class SeedSetCreateView(CreateView, ContextMixin):
     model = SeedSet
     form_class = SeedSetForm
     template_name = 'ui/seedset_create.html'
     success_url = reverse_lazy('seedset_list')
+
+    def get_context_data(self, **kwargs):
+        seed_set_type = self.kwargs['seed_set_type']
+        # We can pass more here if we need
+        return {'seed_set_type': seed_set_type}
 
 
 class SeedSetUpdateView(UpdateView):

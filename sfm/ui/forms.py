@@ -113,3 +113,13 @@ class CredentialForm(forms.ModelForm):
         return super(CredentialForm, self).save(commit)
 
 
+class SeedSetSelectTypeForm(forms.Form):
+    # TODO: Replace this with get list of all registered Seed types
+    OPTIONS = (
+        ('twitter_user', 'Twitter User Timeline'),
+        ('twitter_filter', 'Twitter Filter'),
+        ('flickr_user', 'Flickr User'),
+    )
+
+    seed_set_type = forms.CharField(max_length=16,
+                                    widget=forms.Select(choices=OPTIONS))

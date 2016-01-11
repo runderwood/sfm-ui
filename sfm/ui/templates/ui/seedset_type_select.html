@@ -6,7 +6,7 @@
 
 {% block content %}
 <h1><a href={% url "seedset_list" %}>SeedSet</a></h1>
-<h2>Create {{seed_set_type}} SeedSet</h2>
+<h2>Select SeedSet Type</h2>
 
 <form action="" method="post">{% csrf_token %}
     {{ form|crispy }}
