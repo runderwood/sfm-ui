@@ -1,4 +1,7 @@
 registry = []
+ENUMERATION = 'Enumeration'
+TEXT = 'Text'
+NUMERIC = 'Numeric'
 
 
 class Harvester():
@@ -18,3 +21,7 @@ class Harvester():
 
 def get_harvester_list():
     return registry
+
+
+class SeedType():
+    name = ''
