@@ -3,6 +3,12 @@ from django.db import models
 from django.utils import timezone
 from django.utils.encoding import python_2_unicode_compatible
 from jsonfield import JSONField
+import uuid
+from django.conf import settings
+
+
+def default_uuid():
+    return uuid.uuid4().hex
 
 
 class User(AbstractUser):
@@ -24,6 +30,7 @@ class Credential(models.Model):
 @python_2_unicode_compatible
 class Collection(models.Model):
 
+    collection_id = models.CharField(max_length=32, unique=True, default=default_uuid)
     group = models.ForeignKey(Group, related_name='collections')
     name = models.CharField(max_length=255, blank=False,
                             verbose_name='Collection name')
@@ -50,6 +57,8 @@ class SeedSet(models.Model):
         ('twitter_filter', 'Twitter filter'),
         ('flickr_user', 'Flickr user')
     ]
+
+    seedset_id = models.CharField(max_length=32, unique=True, default=default_uuid)
     collection = models.ForeignKey(Collection, related_name='seed_sets')
     credential = models.ForeignKey(Credential, related_name='seed_sets')
     harvest_type = models.CharField(max_length=255, choices=HARVEST_CHOICES)
@@ -77,6 +86,7 @@ class SeedSet(models.Model):
 class Seed(models.Model):
 
     seed_set = models.ForeignKey(SeedSet, related_name='seeds')
+    seed_id = models.CharField(max_length=32, unique=True, default=default_uuid)
     token = models.TextField(blank=True)
     uid = models.TextField(blank=True)
     is_active = models.BooleanField(default=True)
@@ -101,7 +111,7 @@ class Harvest(models.Model):
         (RUNNING, RUNNING)
     )
     seed_set = models.ForeignKey(SeedSet, related_name='harvests')
-    harvest_id = models.CharField(max_length=255, blank=False, unique=True)
+    harvest_id = models.CharField(max_length=32, unique=True, default=default_uuid)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default=REQUESTED)
     date_requested = models.DateTimeField(blank=True, default=timezone.now)
     date_started = models.DateTimeField(blank=True, null=True)
@@ -116,10 +126,64 @@ class Harvest(models.Model):
     warcs_count = models.PositiveIntegerField(default=0)
     warcs_bytes = models.BigIntegerField(default=0)
 
+    def __str__(self):
+        return '<Harvest %s "%s">' % (self.id, self.harvest_id)
 
-class Media(models.Model):
 
-    harvest = models.ForeignKey(Harvest, related_name='media')
-    size = models.PositiveIntegerField(default=0, help_text='Size (bytes)')
-    host = models.CharField(max_length=255, blank=True)
+class Warc(models.Model):
+
+    harvest = models.ForeignKey(Harvest, related_name='warcs')
+    warc_id = models.CharField(max_length=32, unique=True)
+    path = models.TextField()
+    sha1 = models.CharField(max_length=42)
+    bytes = models.PositiveIntegerField()
+    date_created = models.DateTimeField()
+    date_added = models.DateTimeField(default=timezone.now)
+    date_updated = models.DateTimeField(auto_now=True)
+
+
+class Export(models.Model):
+    NOT_REQUESTED = "not requested"
+    REQUESTED = "requested"
+    SUCCESS = "completed success"
+    FAILURE = "completed failure"
+    STATUS_CHOICES = (
+        (NOT_REQUESTED, NOT_REQUESTED),
+        (REQUESTED, REQUESTED),
+        (SUCCESS, SUCCESS),
+        (FAILURE, FAILURE)
+    )
+    FORMAT_CHOICES = (
+        ("csv", "Comma separated values (CSV)"),
+        ("tsv", "Tab separated values (TSV)"),
+        ("html", "HTML"),
+        ("xlsx", "Excel (XLSX)"),
+        ("json", "JSON"),
+        ("json_full", "Full JSON")
+    )
+    user = models.ForeignKey(User, related_name='exports')
+    seed_set = models.ForeignKey(SeedSet, blank=True, null=True)
+    seeds = models.ManyToManyField(Seed, blank=True)
+    export_id = models.CharField(max_length=32, unique=True, default=default_uuid)
+    export_type = models.CharField(max_length=255)
+    export_format = models.CharField(max_length=10, choices=FORMAT_CHOICES, default="csv")
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default=NOT_REQUESTED)
     path = models.TextField(blank=True)
+    date_requested = models.DateTimeField(blank=True, null=True)
+    date_started = models.DateTimeField(blank=True, null=True)
+    date_ended = models.DateTimeField(blank=True, null=True)
+    dedupe = models.BooleanField(blank=False, default=False)
+    item_date_start = models.DateTimeField(blank=True, null=True)
+    item_date_end = models.DateTimeField(blank=True, null=True)
+    harvest_date_start = models.DateTimeField(blank=True, null=True)
+    harvest_date_end = models.DateTimeField(blank=True, null=True)
+    infos = JSONField(blank=True)
+    warnings = JSONField(blank=True)
+    errors = JSONField(blank=True)
+
+    def save(self, *args, **kwargs):
+        self.path = "{}/export/{}".format(settings.SFM_DATA_DIR, self.export_id)
+        super(Export, self).save(*args, **kwargs)
+
+    def __str__(self):
+        return '<Export %s "%s">' % (self.id, self.export_id)

@@ -1,9 +1,8 @@
 import json
 from .rabbit import RabbitWorker
-from .models import SeedSet, Harvest
+from .models import SeedSet, Harvest, default_uuid
 from django.core.exceptions import ObjectDoesNotExist
 import logging
-import datetime
 from django.conf import settings
 
 log = logging.getLogger(__name__)
@@ -24,12 +23,12 @@ def seedset_harvest(seedset_id):
         return
 
     # Id
-    harvest_id = "harvest:{}:{}".format(seedset_id, datetime.datetime.now().isoformat())
+    harvest_id = default_uuid()
     message["id"] = harvest_id
 
     # Collection
     collection = seedset.collection
-    message["collection"]["id"] = "collection:{}".format(collection.id)
+    message["collection"]["id"] = collection.collection_id
     message["collection"]["path"] = "{}/collection/{}".format(settings.SFM_DATA_DIR, collection.id)
 
     # Credential

@@ -7,6 +7,7 @@ import django.contrib.auth.models
 import django.utils.timezone
 from django.conf import settings
 import django.core.validators
+import ui.models
 
 
 class Migration(migrations.Migration):
@@ -47,6 +48,7 @@ class Migration(migrations.Migration):
             name='Collection',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('collection_id', models.CharField(default=ui.models.default_uuid, unique=True, max_length=32)),
                 ('name', models.CharField(max_length=255, verbose_name=b'Collection name')),
                 ('description', models.TextField(blank=True)),
                 ('is_visible', models.BooleanField(default=True)),
@@ -71,7 +73,7 @@ class Migration(migrations.Migration):
             name='Harvest',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('harvest_id', models.CharField(unique=True, max_length=255)),
+                ('harvest_id', models.CharField(default=ui.models.default_uuid, unique=True, max_length=32)),
                 ('status', models.CharField(default=b'requested', max_length=20, choices=[(b'requested', b'requested'), (b'completed success', b'completed success'), (b'completed failure', b'completed failure'), (b'running', b'running')])),
                 ('date_requested', models.DateTimeField(default=django.utils.timezone.now, blank=True)),
                 ('date_started', models.DateTimeField(null=True, blank=True)),
@@ -88,19 +90,10 @@ class Migration(migrations.Migration):
             ],
         ),
         migrations.CreateModel(
-            name='Media',
-            fields=[
-                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('size', models.PositiveIntegerField(default=0, help_text=b'Size (bytes)')),
-                ('host', models.CharField(max_length=255, blank=True)),
-                ('path', models.TextField(blank=True)),
-                ('harvest', models.ForeignKey(related_name='media', to='ui.Harvest')),
-            ],
-        ),
-        migrations.CreateModel(
             name='Seed',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('seed_id', models.CharField(default=ui.models.default_uuid, unique=True, max_length=32)),
                 ('token', models.TextField(blank=True)),
                 ('uid', models.TextField(blank=True)),
                 ('is_active', models.BooleanField(default=True)),
@@ -114,6 +107,7 @@ class Migration(migrations.Migration):
             name='SeedSet',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('seedset_id', models.CharField(default=ui.models.default_uuid, unique=True, max_length=32)),
                 ('harvest_type', models.CharField(max_length=255, blank=True)),
                 ('name', models.CharField(max_length=255)),
                 ('description', models.TextField(blank=True)),
@@ -128,6 +122,20 @@ class Migration(migrations.Migration):
                 ('end_date', models.DateTimeField(null=True, blank=True)),
                 ('collection', models.ForeignKey(related_name='seed_sets', to='ui.Collection')),
                 ('credential', models.ForeignKey(related_name='seed_sets', to='ui.Credential')),
+            ],
+        ),
+        migrations.CreateModel(
+            name='Warc',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('warc_id', models.CharField(unique=True, max_length=32)),
+                ('path', models.TextField()),
+                ('sha1', models.CharField(max_length=42)),
+                ('bytes', models.PositiveIntegerField()),
+                ('date_created', models.DateTimeField()),
+                ('date_added', models.DateTimeField(default=django.utils.timezone.now)),
+                ('date_updated', models.DateTimeField(auto_now=True)),
+                ('harvest', models.ForeignKey(related_name='warcs', to='ui.Harvest')),
             ],
         ),
         migrations.AddField(

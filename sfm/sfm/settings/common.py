@@ -48,6 +48,8 @@ INSTALLED_APPS = [
     'crispy_forms',                 # for django crispy forms
     'apscheduler',                  # Scheduler
     'message_consumer',             # Message Consumer
+    'rest_framework',               # For REST API
+    'api'
 ]
 
 MIDDLEWARE_CLASSES = (
@@ -139,11 +141,18 @@ RABBITMQ_PASSWORD = env.get('SFM_RABBITMQ_PASSWORD')
 # crispy forms bootstrap version
 CRISPY_TEMPLATE_PACK = 'bootstrap3'
 
+REST_FRAMEWORK = {
+    'DEFAULT_FILTER_BACKENDS': ('rest_framework.filters.DjangoFilterBackend',)
+}
+
 # Directory where SFM data (e.g., harvested WARCs) is stored.
 SFM_DATA_DIR = env.get("SFM_DATA_DIR", "/sfm-data")
 
 # Whether to register receivers on SeedSet for scheduling harvests.
 SCHEDULE_HARVESTS = True
+
+# Whether to register receivers on Export for performing exports.
+PERFORM_EXPORTS = True
 
 # Add a 5 minute schedule interval. This is useful for dev and testing.
 FIVE_MINUTE_SCHEDULE = env.get('SFM_FIVE_MINUTE_SCHEDULE', 'False') == 'True'
