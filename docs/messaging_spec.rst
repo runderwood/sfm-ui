@@ -272,6 +272,9 @@ created during a harvest. Example::
             "path": "/var/folders/_d/3zzlntjs45nbq1f4dnv48c499mgzyf/T/tmpKwq9NL/test_collection",
             "id": "test_collection"
         }
+        "harvest": {
+            "id": "sfmui:45"
+        }
     }
 
 * The routing key will be `warc_created`.
