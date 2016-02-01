@@ -89,16 +89,6 @@ class Migration(migrations.Migration):
             ],
         ),
         migrations.CreateModel(
-            name='Media',
-            fields=[
-                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('size', models.PositiveIntegerField(default=0, help_text=b'Size (bytes)')),
-                ('host', models.CharField(max_length=255, blank=True)),
-                ('path', models.TextField(blank=True)),
-                ('harvest', models.ForeignKey(related_name='media', to='ui.Harvest')),
-            ],
-        ),
-        migrations.CreateModel(
             name='Seed',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
@@ -129,6 +119,20 @@ class Migration(migrations.Migration):
                 ('end_date', models.DateTimeField(null=True, blank=True)),
                 ('collection', models.ForeignKey(related_name='seed_sets', to='ui.Collection')),
                 ('credential', models.ForeignKey(related_name='seed_sets', to='ui.Credential')),
+            ],
+        ),
+        migrations.CreateModel(
+            name='Warc',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('warc_id', models.CharField(unique=True, max_length=255)),
+                ('path', models.TextField()),
+                ('sha1', models.CharField(max_length=42)),
+                ('bytes', models.PositiveIntegerField()),
+                ('date_created', models.DateTimeField()),
+                ('date_added', models.DateTimeField(default=django.utils.timezone.now)),
+                ('date_updated', models.DateTimeField(auto_now=True)),
+                ('harvest', models.ForeignKey(related_name='warcs', to='ui.Harvest')),
             ],
         ),
         migrations.AddField(

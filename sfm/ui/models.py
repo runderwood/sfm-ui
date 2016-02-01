@@ -110,9 +110,13 @@ class Harvest(models.Model):
     warcs_bytes = models.BigIntegerField(default=0)
 
 
-class Media(models.Model):
+class Warc(models.Model):
 
-    harvest = models.ForeignKey(Harvest, related_name='media')
-    size = models.PositiveIntegerField(default=0, help_text='Size (bytes)')
-    host = models.CharField(max_length=255, blank=True)
-    path = models.TextField(blank=True)
+    harvest = models.ForeignKey(Harvest, related_name='warcs')
+    warc_id = models.CharField(max_length=255, unique=True)
+    path = models.TextField()
+    sha1 = models.CharField(max_length=42)
+    bytes = models.PositiveIntegerField()
+    date_created = models.DateTimeField()
+    date_added = models.DateTimeField(default=timezone.now)
+    date_updated = models.DateTimeField(auto_now=True)
