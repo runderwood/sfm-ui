@@ -93,8 +93,18 @@ class Harvest(a.ModelAdmin):
     list_filter = ['status', 'date_requested', 'date_updated']
     search_fields = ['id', 'harvest_id', 'seed_set']
 
+
+class Warc(a.ModelAdmin):
+    fields = (
+       'warc_id', 'harvest', 'path', 'sha1', 'bytes', 'date_created')
+    list_display = ['id', 'warc_id', 'harvest', 'date_created']
+    list_filter = ['date_created']
+    search_fields = ['id', 'warc_id', 'path']
+
+
 a.site.register(m.Credential, Credential)
 a.site.register(m.Collection, Collection)
 a.site.register(m.SeedSet, SeedSet)
 a.site.register(m.Seed, Seed)
 a.site.register(m.Harvest, Harvest)
+a.site.register(m.Warc, Warc)
