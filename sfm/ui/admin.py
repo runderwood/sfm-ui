@@ -46,7 +46,7 @@ class Credential(a.ModelAdmin):
 
 
 class Collection(a.ModelAdmin):
-    fields = ('group', 'name', 'description', 'is_active', 'is_visible',
+    fields = ('collection_id', 'group', 'name', 'description', 'is_active', 'is_visible',
               'stats', 'date_added')
     list_display = ['group', 'name', 'description', 'is_active', 'is_visible',
                     'stats', 'date_added', 'date_updated']
@@ -57,7 +57,7 @@ class Collection(a.ModelAdmin):
 
 
 class SeedSet(a.ModelAdmin):
-    fields = ('collection', 'credential', 'harvest_type', 'name',
+    fields = ('seedset_id', 'collection', 'credential', 'harvest_type', 'name',
               'description', 'is_active', 'schedule_minutes', 'harvest_options',
               'max_count', 'stats', 'date_added', 'start_date', 'end_date')
     list_display = ['collection', 'credential', 'harvest_type', 'name',
@@ -75,7 +75,7 @@ class SeedSet(a.ModelAdmin):
 
 
 class Seed(a.ModelAdmin):
-    fields = ('seed_set', 'token', 'uid', 'is_active',
+    fields = ('seed_id', 'seed_set', 'token', 'uid', 'is_active',
               'is_valid', 'stats', 'date_added')
     list_display = ['seed_set', 'token', 'uid', 'is_active',
                     'is_valid', 'stats', 'date_added', 'date_updated']

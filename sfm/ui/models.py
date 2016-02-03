@@ -3,6 +3,11 @@ from django.db import models
 from django.utils import timezone
 from django.utils.encoding import python_2_unicode_compatible
 from jsonfield import JSONField
+import uuid
+
+
+def default_uuid():
+    return uuid.uuid4().hex
 
 
 class User(AbstractUser):
@@ -24,6 +29,7 @@ class Credential(models.Model):
 @python_2_unicode_compatible
 class Collection(models.Model):
 
+    collection_id = models.CharField(max_length=32, unique=True, default=default_uuid)
     group = models.ForeignKey(Group, related_name='collections')
     name = models.CharField(max_length=255, blank=False,
                             verbose_name='Collection name')
@@ -46,6 +52,8 @@ class SeedSet(models.Model):
         (60 * 24 * 7, 'Every week'),
         (60 * 24 * 7 * 4, 'Every 4 weeks')
     ]
+
+    seedset_id = models.CharField(max_length=32, unique=True, default=default_uuid)
     collection = models.ForeignKey(Collection, related_name='seed_sets')
     credential = models.ForeignKey(Credential, related_name='seed_sets')
     harvest_type = models.CharField(max_length=255, blank=True)
@@ -70,6 +78,7 @@ class SeedSet(models.Model):
 class Seed(models.Model):
 
     seed_set = models.ForeignKey(SeedSet, related_name='seeds')
+    seed_id = models.CharField(max_length=32, unique=True, default=default_uuid)
     token = models.TextField(blank=True)
     uid = models.TextField(blank=True)
     is_active = models.BooleanField(default=True)
@@ -94,7 +103,7 @@ class Harvest(models.Model):
         (RUNNING, RUNNING)
     )
     seed_set = models.ForeignKey(SeedSet, related_name='harvests')
-    harvest_id = models.CharField(max_length=255, blank=False, unique=True)
+    harvest_id = models.CharField(max_length=32, unique=True, default=default_uuid)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default=REQUESTED)
     date_requested = models.DateTimeField(blank=True, default=timezone.now)
     date_started = models.DateTimeField(blank=True, null=True)
@@ -113,7 +122,7 @@ class Harvest(models.Model):
 class Warc(models.Model):
 
     harvest = models.ForeignKey(Harvest, related_name='warcs')
-    warc_id = models.CharField(max_length=255, unique=True)
+    warc_id = models.CharField(max_length=32, unique=True)
     path = models.TextField()
     sha1 = models.CharField(max_length=42)
     bytes = models.PositiveIntegerField()
