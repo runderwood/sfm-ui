@@ -13,13 +13,19 @@ class UIConfig(AppConfig):
 
     def ready(self):
         RabbitWorker().declare_exchange()
-        from models import SeedSet
+        from models import SeedSet, Export
         from sched import start_sched, schedule_harvest_receiver, unschedule_harvest_receiver
+        from export import export_receiver
 
         if settings.SCHEDULE_HARVESTS:
             log.debug("Setting receivers for seedsets.")
             post_save.connect(schedule_harvest_receiver, sender=SeedSet)
             pre_delete.connect(unschedule_harvest_receiver, sender=SeedSet)
+
+        # Export
+        if settings.PERFORM_EXPORTS:
+            log.debug("Setting receiver for exports.")
+            post_save.connect(export_receiver, sender=Export)
 
         # Add 5 minute interval
         if settings.FIVE_MINUTE_SCHEDULE:

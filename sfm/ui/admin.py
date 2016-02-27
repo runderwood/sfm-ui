@@ -102,9 +102,20 @@ class Warc(a.ModelAdmin):
     search_fields = ['id', 'warc_id', 'path']
 
 
+class Export(a.ModelAdmin):
+    fields = (
+       'user', 'seed_set', 'seeds', 'export_id', 'export_type', 'export_format',
+       'status', 'path', 'date_requested', 'date_started', 'date_ended', 'dedupe',
+       'item_date_start', 'item_date_end', 'harvest_date_start', 'harvest_date_end',
+       'infos', 'warnings', 'errors')
+    list_display = ['id', 'user', 'export_type', 'date_requested', 'status']
+    list_filter = ['date_requested', 'user', 'export_type', 'status']
+    search_fields = ['id', 'export_id', 'path']
+
 a.site.register(m.Credential, Credential)
 a.site.register(m.Collection, Collection)
 a.site.register(m.SeedSet, SeedSet)
 a.site.register(m.Seed, Seed)
 a.site.register(m.Harvest, Harvest)
 a.site.register(m.Warc, Warc)
+a.site.register(m.Export, Export)

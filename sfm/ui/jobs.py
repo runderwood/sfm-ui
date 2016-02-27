@@ -3,7 +3,6 @@ from .rabbit import RabbitWorker
 from .models import SeedSet, Harvest, default_uuid
 from django.core.exceptions import ObjectDoesNotExist
 import logging
-import uuid
 from django.conf import settings
 
 log = logging.getLogger(__name__)

@@ -1,6 +1,6 @@
 import logging
 from sfmutils.consumer import BaseConsumer
-from ui.models import Harvest, SeedSet, Seed, Warc
+from ui.models import Harvest, SeedSet, Seed, Warc, Export
 import json
 from django.core.exceptions import ObjectDoesNotExist
 import iso8601
@@ -18,6 +18,8 @@ class SfmUiConsumer(BaseConsumer):
             self._on_harvest_status_message()
         elif self.routing_key == "warc_created":
             self._on_warc_created_message()
+        elif self.routing_key.startswith("export.status."):
+            self._on_export_status_message()
         else:
             log.warn("Unexpected message with routing key {}: {}", self.routing_key, json.dumps(self.message, indent=4))
 
@@ -71,15 +73,35 @@ class SfmUiConsumer(BaseConsumer):
             log.debug("Warc with id {}", self.message["warc"]["id"])
             # Create warc model object
             warc = Warc.objects.create(
-                harvest = Harvest.objects.get(harvest_id=self.message["harvest"]["id"]),
-                warc_id = self.message["warc"]["id"],
-                path = self.message["warc"]["path"],
-                sha1 = self.message["warc"]["sha1"],
-                bytes = self.message["warc"]["bytes"],
-                date_created = iso8601.parse_date(self.message["warc"]["date_created"])
+                harvest=Harvest.objects.get(harvest_id=self.message["harvest"]["id"]),
+                warc_id=self.message["warc"]["id"],
+                path=self.message["warc"]["path"],
+                sha1=self.message["warc"]["sha1"],
+                bytes=self.message["warc"]["bytes"],
+                date_created=iso8601.parse_date(self.message["warc"]["date_created"])
             )
             warc.save()
 
         except ObjectDoesNotExist:
             log.error("Harvest model object not found for harvest status message: {}",
+                      json.dumps(self.message, indent=4))
+
+    def _on_export_status_message(self):
+        try:
+            log.debug("Updating export with id {}", self.message["id"])
+            # Retrieve export model object
+            export = Export.objects.get(export_id=self.message["id"])
+
+            # And update export model object
+            export.status = self.message["status"]
+            export.infos = self.message.get("infos", [])
+            export.warnings = self.message.get("warnings", [])
+            export.errors = self.message.get("errors", [])
+            export.date_started = iso8601.parse_date(self.message["date_started"])
+            if "date_ended" in self.message:
+                export.date_ended = iso8601.parse_date(self.message["date_ended"])
+            export.save()
+
+        except ObjectDoesNotExist:
+            log.error("Export model object not found for export status message: {}",
                       json.dumps(self.message, indent=4))

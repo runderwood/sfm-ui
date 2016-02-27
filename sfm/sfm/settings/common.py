@@ -151,5 +151,8 @@ SFM_DATA_DIR = env.get("SFM_DATA_DIR", "/sfm-data")
 # Whether to register receivers on SeedSet for scheduling harvests.
 SCHEDULE_HARVESTS = True
 
+# Whether to register receivers on Export for performing exports.
+PERFORM_EXPORTS = True
+
 # Add a 5 minute schedule interval. This is useful for dev and testing.
 FIVE_MINUTE_SCHEDULE = env.get('SFM_FIVE_MINUTE_SCHEDULE', 'False') == 'True'

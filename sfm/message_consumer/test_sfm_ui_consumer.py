@@ -1,5 +1,5 @@
 from django.test import TestCase
-from ui.models import Harvest, SeedSet, Group, Collection, Credential, User, Seed, Warc
+from ui.models import Harvest, SeedSet, Group, Collection, Credential, User, Seed, Warc, Export
 import json
 from message_consumer.sfm_ui_consumer import SfmUiConsumer
 import iso8601
@@ -20,6 +20,7 @@ class ConsumerTest(TestCase):
         Seed.objects.create(seed_set=seedset, uid="131866249@N02")
         Seed.objects.create(seed_set=seedset, token="library_of_congress")
         self.harvest = Harvest.objects.create(harvest_id="test:1", seed_set=seedset)
+        Export.objects.create(export_id="test:2", user=user, export_type="test_type")
         self.consumer = SfmUiConsumer()
 
     def test_harvest_status_on_message(self):
@@ -92,7 +93,8 @@ class ConsumerTest(TestCase):
         self.consumer.routing_key = "warc_created"
         self.consumer.message = {
             "warc": {
-                "path": "/var/folders/_d/3zzlntjs45nbq1f4dnv48c499mgzyf/T/tmpKwq9NL/test_collection/2015/07/28/11/test_collection-flickr-2015-07-28T11:17:36Z.warc.gz",
+                "path": "/var/folders/_d/3zzlntjs45nbq1f4dnv48c499mgzyf/T/tmpKwq9NL/test_collection/2015/07/28/11/" +
+                        "test_collection-flickr-2015-07-28T11:17:36Z.warc.gz",
                 "sha1": "7512e1c227c29332172118f0b79b2ca75cbe8979",
                 "bytes": 26146,
                 "id": "test_collection-flickr-2015-07-28T11:17:36Z",
@@ -116,3 +118,27 @@ class ConsumerTest(TestCase):
         self.assertEqual(self.consumer.message["warc"]["bytes"], warc.bytes)
         self.assertEqual(iso8601.parse_date("2015-07-28T11:17:36.640178"), warc.date_created)
         self.assertEqual(self.harvest, warc.harvest)
+
+    def test_export_status_on_message(self):
+        self.consumer.routing_key = "export.status.test"
+        self.consumer.message = {
+            "id": "test:2",
+            "status": "completed success",
+            "date_started": "2015-07-28T11:17:36.640044",
+            "date_ended": "2015-07-28T11:17:42.539470",
+            "infos": [{"code": "test_code_1", "message": "congratulations"}],
+            "warnings": [{"code": "test_code_2", "message": "be careful"}],
+            "errors": [{"code": "test_code_3", "message": "oops"}]
+        }
+
+        # Trigger on_message
+        self.consumer.on_message()
+
+        # Check updated harvest model object
+        export = Export.objects.get(export_id="test:2")
+        self.assertEqual("completed success", export.status)
+        self.assertEqual(iso8601.parse_date("2015-07-28T11:17:36.640044"), export.date_started)
+        self.assertEqual(iso8601.parse_date("2015-07-28T11:17:42.539470"), export.date_ended)
+        self.assertListEqual([{"code": "test_code_1", "message": "congratulations"}], export.infos)
+        self.assertListEqual([{"code": "test_code_2", "message": "be careful"}], export.warnings)
+        self.assertListEqual([{"code": "test_code_3", "message": "oops"}], export.errors)

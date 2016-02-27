@@ -4,6 +4,7 @@ from django.utils import timezone
 from django.utils.encoding import python_2_unicode_compatible
 from jsonfield import JSONField
 import uuid
+from django.conf import settings
 
 
 def default_uuid():
@@ -118,6 +119,9 @@ class Harvest(models.Model):
     warcs_count = models.PositiveIntegerField(default=0)
     warcs_bytes = models.BigIntegerField(default=0)
 
+    def __str__(self):
+        return '<Harvest %s "%s">' % (self.id, self.harvest_id)
+
 
 class Warc(models.Model):
 
@@ -129,3 +133,48 @@ class Warc(models.Model):
     date_created = models.DateTimeField()
     date_added = models.DateTimeField(default=timezone.now)
     date_updated = models.DateTimeField(auto_now=True)
+
+
+class Export(models.Model):
+    REQUESTED = "requested"
+    SUCCESS = "completed success"
+    FAILURE = "completed failure"
+    STATUS_CHOICES = (
+        (REQUESTED, REQUESTED),
+        (SUCCESS, SUCCESS),
+        (FAILURE, FAILURE)
+    )
+    FORMAT_CHOICES = (
+        ("csv", "Comma separated values (CSV)"),
+        ("tsv", "Tab separated values (TSV)"),
+        ("html", "HTML"),
+        ("xlsx", "Excel (XLSX)"),
+        ("json", "JSON"),
+        ("json_full", "Full JSON")
+    )
+    user = models.ForeignKey(User, related_name='exports')
+    seed_set = models.ForeignKey(SeedSet, blank=True, null=True)
+    seeds = models.ManyToManyField(Seed, blank=True)
+    export_id = models.CharField(max_length=32, unique=True, default=default_uuid)
+    export_type = models.CharField(max_length=255)
+    export_format = models.CharField(max_length=10, choices=FORMAT_CHOICES, default="csv")
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default=REQUESTED)
+    path = models.TextField(blank=True)
+    date_requested = models.DateTimeField(blank=True, default=timezone.now)
+    date_started = models.DateTimeField(blank=True, null=True)
+    date_ended = models.DateTimeField(blank=True, null=True)
+    dedupe = models.BooleanField(blank=False, default=False)
+    item_date_start = models.DateTimeField(blank=True, null=True)
+    item_date_end = models.DateTimeField(blank=True, null=True)
+    harvest_date_start = models.DateTimeField(blank=True, null=True)
+    harvest_date_end = models.DateTimeField(blank=True, null=True)
+    infos = JSONField(blank=True)
+    warnings = JSONField(blank=True)
+    errors = JSONField(blank=True)
+
+    def save(self, *args, **kwargs):
+        self.path = "{}/export/{}".format(settings.SFM_DATA_DIR, self.export_id)
+        super(Export, self).save(*args, **kwargs)
+
+    def __str__(self):
+        return '<Export %s "%s">' % (self.id, self.export_id)
