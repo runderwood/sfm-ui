@@ -4,6 +4,7 @@ from ui.models import Harvest, SeedSet, Seed, Warc, Export
 import json
 from django.core.exceptions import ObjectDoesNotExist
 import iso8601
+import time
 
 log = logging.getLogger(__name__)
 
@@ -14,6 +15,10 @@ class SfmUiConsumer(BaseConsumer):
     messages from the queue and updates the models as appropriate.
     """
     def on_message(self):
+        # This is the worst ever, but it avoids a race condition.
+        # It is possible for the harvester/exporter to respond before the commit occurs.
+        time.sleep(1)
+
         if self.routing_key.startswith("harvest.status."):
             self._on_harvest_status_message()
         elif self.routing_key == "warc_created":
@@ -21,11 +26,11 @@ class SfmUiConsumer(BaseConsumer):
         elif self.routing_key.startswith("export.status."):
             self._on_export_status_message()
         else:
-            log.warn("Unexpected message with routing key {}: {}", self.routing_key, json.dumps(self.message, indent=4))
+            log.warn("Unexpected message with routing key %s: %s", self.routing_key, json.dumps(self.message, indent=4))
 
     def _on_harvest_status_message(self):
         try:
-            log.debug("Updating harvest with id {}", self.message["id"])
+            log.debug("Updating harvest with id %s", self.message["id"])
             # Retrieve harvest model object
             harvest = Harvest.objects.get(harvest_id=self.message["id"])
 
@@ -52,7 +57,7 @@ class SfmUiConsumer(BaseConsumer):
                     seed.token = token
                     seed.save()
                 except ObjectDoesNotExist:
-                    log.error("Seed model object with uid {} not found to update token to {}", uid, token)
+                    log.error("Seed model object with uid %s not found to update token to %s", uid, token)
 
             # Update seeds based on uids that have been returned
             for token, uid in self.message.get("uids", {}).items():
@@ -62,15 +67,15 @@ class SfmUiConsumer(BaseConsumer):
                     seed.uid = uid
                     seed.save()
                 except ObjectDoesNotExist:
-                    log.error("Seed model object with token {} not found to update uid to {}", token, uid)
+                    log.error("Seed model object with token %s not found to update uid to %s", token, uid)
 
         except ObjectDoesNotExist:
-            log.error("Harvest model object not found for harvest status message: {}",
+            log.error("Harvest model object not found for harvest status message: %s",
                       json.dumps(self.message, indent=4))
 
     def _on_warc_created_message(self):
         try:
-            log.debug("Warc with id {}", self.message["warc"]["id"])
+            log.debug("Warc with id %s", self.message["warc"]["id"])
             # Create warc model object
             warc = Warc.objects.create(
                 harvest=Harvest.objects.get(harvest_id=self.message["harvest"]["id"]),
@@ -83,12 +88,12 @@ class SfmUiConsumer(BaseConsumer):
             warc.save()
 
         except ObjectDoesNotExist:
-            log.error("Harvest model object not found for harvest status message: {}",
+            log.error("Harvest model object not found for harvest status message: %s",
                       json.dumps(self.message, indent=4))
 
     def _on_export_status_message(self):
         try:
-            log.debug("Updating export with id {}", self.message["id"])
+            log.debug("Updating export with id %s", self.message["id"])
             # Retrieve export model object
             export = Export.objects.get(export_id=self.message["id"])
 
@@ -103,5 +108,5 @@ class SfmUiConsumer(BaseConsumer):
             export.save()
 
         except ObjectDoesNotExist:
-            log.error("Export model object not found for export status message: {}",
+            log.error("Export model object not found for export status message: %s",
                       json.dumps(self.message, indent=4))

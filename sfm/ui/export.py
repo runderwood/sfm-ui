@@ -1,5 +1,7 @@
 from .rabbit import RabbitWorker
 import logging
+from django.utils import timezone
+from .models import Export
 
 log = logging.getLogger(__name__)
 
@@ -7,12 +9,34 @@ log = logging.getLogger(__name__)
 def export_receiver(sender, **kwargs):
     assert kwargs["instance"]
 
-    # Only when export is created
-    if "created" in kwargs and kwargs["created"]:
+    log.debug("Export receiver invoked")
+
+    if kwargs.get("created", False):
+        request_export(kwargs["instance"])
+
+
+def export_m2m_receiver(sender, **kwargs):
+    assert kwargs["instance"]
+    assert kwargs["action"]
+
+    log.debug("Export m2m receiver invoked with action %s", kwargs["action"])
+
+    if kwargs["action"] == "post_add":
         request_export(kwargs["instance"])
 
 
 def request_export(export):
+
+    # Return if already requested
+    if export.status != Export.NOT_REQUESTED:
+        log.debug("Export %s already requested", export.export_id)
+        return
+
+    # Return if no seeds or seed sets. Many-to-many like seeds are added after save.
+    # Will wait for m2m_changed to request export.
+    if not export.seed_set and not export.seeds.all():
+        log.debug("No seeds or seed sets yet")
+        return
 
     message = {
         "id": export.export_id,
@@ -46,3 +70,8 @@ def request_export(export):
 
     # Publish message to queue via rabbit worker
     RabbitWorker().send_message(message, routing_key)
+
+    # Update date requested
+    export.date_requested = timezone.now()
+    export.status = Export.REQUESTED
+    export.save()

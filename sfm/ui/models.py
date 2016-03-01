@@ -136,10 +136,12 @@ class Warc(models.Model):
 
 
 class Export(models.Model):
+    NOT_REQUESTED = "not requested"
     REQUESTED = "requested"
     SUCCESS = "completed success"
     FAILURE = "completed failure"
     STATUS_CHOICES = (
+        (NOT_REQUESTED, NOT_REQUESTED),
         (REQUESTED, REQUESTED),
         (SUCCESS, SUCCESS),
         (FAILURE, FAILURE)
@@ -158,9 +160,9 @@ class Export(models.Model):
     export_id = models.CharField(max_length=32, unique=True, default=default_uuid)
     export_type = models.CharField(max_length=255)
     export_format = models.CharField(max_length=10, choices=FORMAT_CHOICES, default="csv")
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default=REQUESTED)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default=NOT_REQUESTED)
     path = models.TextField(blank=True)
-    date_requested = models.DateTimeField(blank=True, default=timezone.now)
+    date_requested = models.DateTimeField(blank=True, null=True)
     date_started = models.DateTimeField(blank=True, null=True)
     date_ended = models.DateTimeField(blank=True, null=True)
     dedupe = models.BooleanField(blank=False, default=False)

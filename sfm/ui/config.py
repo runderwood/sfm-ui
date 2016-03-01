@@ -1,6 +1,6 @@
 from django.apps import AppConfig
 from rabbit import RabbitWorker
-from django.db.models.signals import post_save, pre_delete
+from django.db.models.signals import post_save, pre_delete, m2m_changed
 from django.conf import settings
 import logging
 
@@ -15,7 +15,7 @@ class UIConfig(AppConfig):
         RabbitWorker().declare_exchange()
         from models import SeedSet, Export
         from sched import start_sched, schedule_harvest_receiver, unschedule_harvest_receiver
-        from export import export_receiver
+        from export import export_receiver, export_m2m_receiver
 
         if settings.SCHEDULE_HARVESTS:
             log.debug("Setting receivers for seedsets.")
@@ -26,6 +26,7 @@ class UIConfig(AppConfig):
         if settings.PERFORM_EXPORTS:
             log.debug("Setting receiver for exports.")
             post_save.connect(export_receiver, sender=Export)
+            m2m_changed.connect(export_m2m_receiver, sender=Export.seeds.through)
 
         # Add 5 minute interval
         if settings.FIVE_MINUTE_SCHEDULE:
