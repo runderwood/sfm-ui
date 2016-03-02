@@ -46,12 +46,15 @@ def request_export(export):
         "path": export.path
     }
 
+    platform = None
     if export.seed_set:
         message["seedset"] = {"id": export.seed_set.seedset_id}
+        platform = export.seed_set.credential.platform
 
     seeds = []
     for seed in export.seeds.all():
         seeds.append({"id": seed.seed_id, "uid": seed.uid})
+        platform = seed.seed_set.credential.platform
     if seeds:
         message["seeds"] = seeds
 
@@ -64,7 +67,7 @@ def request_export(export):
     if export.harvest_date_end:
         message["harvest_date_end"] = export.harvest_date_end.isoformat()
 
-    routing_key = "export.start.{}".format(export.export_type)
+    routing_key = "export.start.{}.{}".format(platform, export.export_type)
 
     log.debug("Sending %s message to %s with id %s", export.export_type, routing_key, export.export_id)
 

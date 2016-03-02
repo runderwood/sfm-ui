@@ -54,6 +54,7 @@ class ExportTests(TestCase):
         self.assertEqual(iso8601.parse_date(message["harvest_date_start"]), export.harvest_date_start)
         self.assertEqual(iso8601.parse_date(message["harvest_date_end"]), export.harvest_date_end)
         self.assertEqual(message["seedset"]["id"], export.seed_set.seedset_id)
+        self.assertEqual("export.start.test_platform.test_type", args[1])
 
     @patch("ui.export.RabbitWorker", autospec=True)
     def test_seed_export(self, mock_rabbit_worker_class):
@@ -83,3 +84,4 @@ class ExportTests(TestCase):
         self.assertTrue("harvest_date_end" not in message)
         self.assertListEqual(message["seeds"], [{"id": self.seed1.seed_id, "uid": self.seed1.uid},
                                                 {"id": self.seed2.seed_id, "uid": self.seed2.uid}])
+        self.assertEqual("export.start.test_platform.test_type", args[1])
