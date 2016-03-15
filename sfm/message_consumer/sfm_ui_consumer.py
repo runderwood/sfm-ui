@@ -50,24 +50,24 @@ class SfmUiConsumer(BaseConsumer):
             harvest.save()
 
             # Update seeds based on tokens that have changed
-            for uid, token in self.message.get("token_updates", {}).items():
+            for seed_id, token in self.message.get("token_updates", {}).items():
                 # Try to find seed based on seedset and uid.
                 try:
-                    seed = Seed.objects.get(seed_set=harvest.seed_set, uid=uid)
+                    seed = Seed.objects.get(seed_id=seed_id)
                     seed.token = token
                     seed.save()
                 except ObjectDoesNotExist:
-                    log.error("Seed model object with uid %s not found to update token to %s", uid, token)
+                    log.error("Seed model object with seed_id %s not found to update token to %s", seed_id, token)
 
             # Update seeds based on uids that have been returned
-            for token, uid in self.message.get("uids", {}).items():
+            for seed_id, uid in self.message.get("uids", {}).items():
                 # Try to find seed based on seedset and token.
                 try:
-                    seed = Seed.objects.get(seed_set=harvest.seed_set, token=token)
+                    seed = Seed.objects.get(seed_id=seed_id)
                     seed.uid = uid
                     seed.save()
                 except ObjectDoesNotExist:
-                    log.error("Seed model object with token %s not found to update uid to %s", token, uid)
+                    log.error("Seed model object with seed_id %s not found to update uid to %s", seed_id, uid)
 
         except ObjectDoesNotExist:
             log.error("Harvest model object not found for harvest status message: %s",

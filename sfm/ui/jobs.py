@@ -50,6 +50,7 @@ def seedset_harvest(seedset_id):
 
     for seed in seeds:
         seed_map = {}
+        seed_map["seed_id"] = seed.seed_id
         if seed.token:
             seed_map["token"] = seed.token
         if seed.uid:
