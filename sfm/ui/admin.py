@@ -46,31 +46,31 @@ class Credential(a.ModelAdmin):
 
 
 class Collection(a.ModelAdmin):
-    fields = ('collection_id', 'group', 'name', 'description', 'is_active', 'is_visible',
+    fields = ('collection_id', 'group', 'name', 'description', 'is_visible',
               'stats', 'date_added')
-    list_display = ['group', 'name', 'description', 'is_active', 'is_visible',
+    list_display = ['group', 'name', 'description', 'is_visible',
                     'stats', 'date_added', 'date_updated']
-    list_filter = ['group', 'name', 'description', 'is_active', 'is_visible',
+    list_filter = ['group', 'name', 'description', 'is_visible',
                    'stats', 'date_added', 'date_updated']
-    search_fields = ['group', 'name', 'description', 'is_active',
+    search_fields = ['group', 'name', 'description',
                      'is_visible', 'stats', 'date_added', 'date_updated']
 
 
 class SeedSet(a.ModelAdmin):
     fields = ('seedset_id', 'collection', 'credential', 'harvest_type', 'name',
               'description', 'is_active', 'schedule_minutes', 'harvest_options',
-              'max_count', 'stats', 'date_added', 'start_date', 'end_date')
+              'stats', 'date_added', 'start_date', 'end_date')
     list_display = ['collection', 'credential', 'harvest_type', 'name',
                     'description', 'is_active', 'harvest_options',
-                    'max_count', 'stats', 'date_added', 'start_date',
+                    'stats', 'date_added', 'start_date',
                     'end_date']
     list_filter = ['collection', 'credential', 'harvest_type', 'name',
                    'description', 'is_active', 'harvest_options',
-                   'max_count', 'stats', 'date_added', 'start_date',
+                   'stats', 'date_added', 'start_date',
                    'end_date']
     search_fields = ['collection', 'credential', 'harvest_type', 'name',
                      'description', 'is_active',
-                     'harvest_options', 'max_count', 'stats', 'date_added',
+                     'harvest_options', 'stats', 'date_added',
                      'start_date', 'end_date']
 
 
