@@ -193,6 +193,9 @@ EMAIL_HOST_USER = env.get('SFM_EMAIL_USER')
 EMAIL_HOST_PASSWORD = env.get('SFM_EMAIL_PASSWORD')
 EMAIL_USE_TLS = True
 
+# contact email
+CONTACT_EMAIL = env.get('SFM_CONTACT_EMAIL', 'sfm@gwu.edu')
+
 # Whether to run apscheduler
 RUN_SCHEDULER = env.get('SFM_RUN_SCHEDULER', 'False') == 'True'
 
