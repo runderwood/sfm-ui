@@ -101,27 +101,27 @@
     </div> <!-- /container -->
     {% block modal %}{% endblock modal %}
     <footer class="footer">
-    <div class="footer-upper">
-        <hr>
-        <a class="footer-blue" href="{% url 'home' %}">SFM UI {{ SFM_UI_VERSION }}</a>
-        <span class="footer-divider"> | </span>
-	    <a id="getstarted" class="footer-blue" target="_blank" href="https://sfm.readthedocs.org/en/latest/quickstart.html">
-         Getting Started
-       </a>
-        <span class="footer-divider"> | </span>
-    	<a id="doc" class="footer-blue" target="_blank" href="https://sfm.readthedocs.org">
-          Documentation
-      </a>
-      <span class="footer-divider"> | </span>
-      <a id="contactus" class="footer-blue" target="_blank" href="mailto:{{ CONTACT_EMAIL }}">
-          Contact Us
-      </a>
-    </div>
-    <div class="footer-lower">
-        <p>Copyright©<script type="text/javascript">document.write(new Date().getFullYear());</script>
-            <a href="http://library.gwu.edu/" title="gelman" target="_blank" class="">GW Libraries</a>
-        </p>
-    </div>
+        <div class="footer-upper">
+            <hr>
+            <a class="footer-blue" href="{% url 'home' %}">SFM UI {{ SFM_UI_VERSION }}</a>
+            <span class="footer-divider"> | </span>
+            <a id="getstarted" class="footer-blue" target="_blank" href="https://sfm.readthedocs.org/en/latest/quickstart.html">
+             Getting Started
+            </a>
+            <span class="footer-divider"> | </span>
+            <a id="doc" class="footer-blue" target="_blank" href="https://sfm.readthedocs.org">
+              Documentation
+            </a>
+            <span class="footer-divider"> | </span>
+            <a id="contactus" class="footer-blue" target="_blank" href="mailto:{{ CONTACT_EMAIL }}">
+              Contact Us
+            </a>
+        </div>
+        <div class="footer-lower">
+            <p>Copyright©<script type="text/javascript">document.write(new Date().getFullYear());</script>
+                <strong><a href="http://library.gwu.edu/" title="gwlibraries" target="_blank" class="">GW Libraries</a></strong>
+            </p>
+        </div>
     </footer>
 
 </body>
