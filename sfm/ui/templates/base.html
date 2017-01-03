@@ -16,8 +16,6 @@
 
     <!-- Latest compiled and minified CSS -->
     <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
-    <!-- amazeui css-->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/amazeui/2.7.2/css/amazeui.min.css">
 
     <!-- Optional theme -->
 	<link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap-theme.min.css">
@@ -37,8 +35,6 @@
 
 	<!-- Latest compiled and minified JavaScript -->
 	<script src="https://netdna.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
-	<!-- amazeui css-->
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/amazeui/2.7.2/js/amazeui.min.js"></script>
         
 	{% block javascript %}
 
@@ -104,24 +100,27 @@
 
     </div> <!-- /container -->
     {% block modal %}{% endblock modal %}
-    <footer class="am-footer am-footer-default">
-    <div class="am-footer-switch">
-	  <a id="getstarted" class="am-footer-desktop" target="_blank" href="https://sfm.readthedocs.org/en/latest/quickstart.html">
+    <footer class="footer">
+    <div class="footer-upper">
+        <hr>
+        <a class="footer-blue" href="{% url 'home' %}">SFM UI {{ SFM_UI_VERSION }}</a>
+        <span class="footer-divider"> | </span>
+	    <a id="getstarted" class="footer-blue" target="_blank" href="https://sfm.readthedocs.org/en/latest/quickstart.html">
          Getting Started
-      </a>
-      <span class="am-footer-divider"> | </span>
-    	<a id="doc" class="am-footer-desktop" target="_blank" href="https://sfm.readthedocs.org">
+       </a>
+        <span class="footer-divider"> | </span>
+    	<a id="doc" class="footer-blue" target="_blank" href="https://sfm.readthedocs.org">
           Documentation
       </a>
-      <span class="am-footer-divider"> | </span>
-      <a id="contactus" class="am-footer-desktop" target="_blank" href="mailto:{{ SITE_SUPERUSER_EMAIL }}">
+      <span class="footer-divider"> | </span>
+      <a id="contactus" class="footer-blue" target="_blank" href="mailto:{{ SITE_SUPERUSER_EMAIL }}">
           Contact Us
       </a>
     </div>
-    <div class="am-footer-miscs">
-	<p><a href="http://library.gwu.edu/" title="gelman" target="_blank" class="">GW Libraries</a></p>
-        <p>CopyRight©2016  GW Libraries</p>
-	<p><a href="{% url 'home' %}">SFM UI {{ SFM_UI_VERSION }}</a></p>
+    <div class="footer-lower">
+        <p>CopyRight©<script type="text/javascript">document.write(new Date().getFullYear());</script>
+            <a href="http://library.gwu.edu/" title="gelman" target="_blank" class="">GW Libraries</a>
+        </p>
     </div>
     </footer>
 
