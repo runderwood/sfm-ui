@@ -1,0 +1,17 @@
+{% load humanize %}
+<html>
+<body>
+<p>The following message queues on your <a href="{{ url }}">Social Feed Manager</a> server reach the warning level with <strong>{{ queue_threshold }}</strong> requests. </p>
+<div class="panel-body">
+    <table class="table">
+        {% for queue, msgcount in queue_data %}
+        <tr>
+            <td><strong>{{ queue }}</strong></td>
+            <td>{{ msgcount }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</div>
+<p>For details, please go to SFM <a href="{{ monitor_url }}">Monitor</a> page.</p>
+</body>
+</html>
