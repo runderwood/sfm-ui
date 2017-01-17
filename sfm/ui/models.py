@@ -512,6 +512,7 @@ class Harvest(models.Model):
     VOIDED = "voided"
     STOP_REQUESTED = "stop requested"
     SKIPPED = "skipped"
+    PAUSED = "paused"
     STATUS_CHOICES = (
         (REQUESTED, "Requested"),
         (SUCCESS, "Success"),
@@ -519,7 +520,8 @@ class Harvest(models.Model):
         (RUNNING, "Running"),
         (STOP_REQUESTED, "Stop requested"),
         (VOIDED, "Voided"),
-        (SKIPPED, "Skipped")
+        (SKIPPED, "Skipped"),
+        (PAUSED, "Paused")
     )
     harvest_type = models.CharField(max_length=255)
     historical_collection = models.ForeignKey(HistoricalCollection, related_name='historical_harvests', null=True)
