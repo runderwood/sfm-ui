@@ -100,6 +100,8 @@ user details and modify as appropriate as described in :ref:`install-configurati
     # - echo SFM_SMTP_HOST=smtp.gmail.com >> .env
     # - echo SFM_EMAIL_USER=someone@gmail.com >> .env
     # - echo SFM_EMAIL_PASSWORD=password >> .env
+    # An optional contact email at your institution that is provided to users.
+    # - echo SFM_CONTACT_EMAIL=sfm@yourinstitution.edu >> .env
     # To enable connecting to social media accounts, provide the following.
     # - echo TWITTER_CONSUMER_KEY=mBbq9ruffgEcfsktgQztTHUir8Kn0 >> .env
     # - echo TWITTER_CONSUMER_SECRET=Pf28yReB9Xgz0fpLVO4b46r5idZnKCKQ6xlOomBAjD5npFEQ6Rm >> .env
@@ -162,7 +164,8 @@ Configuration is documented in ``example.env``. For a production deployment, pay
   ``TWITTER_CONSUMER_SECRET``, ``WEIBO_API_KEY``, ``WEIBO_API_SECRET``, and/or ``TUMBLR_CONSUMER_KEY``,
   ``TUMBLR_CONSUMER_SECRET``. These are optional, but will make acquiring credentials easier for users.
   For more information and alternative approaches see :doc:`credentials`.
-* Set an admin email address with ``SFM_SITE_ADMIN_EMAIL``.
+* Set an admin email address with ``SFM_SITE_ADMIN_EMAIL``. Problems with SFM are sent to this address.
+* Set an SFM contact email address with ``SFM_CONTACT_EMAIL``. Users are provided with this address.
 * Provide a contact URL (e.g., http://library.gwu.edu) to be used when web harvesting with ``HERITRIX_CONTACT_URL``.
 
 Note that if you make a change to configuration *after* SFM is brought up, you will need to restart containers. If
