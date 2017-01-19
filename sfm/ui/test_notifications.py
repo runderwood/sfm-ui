@@ -216,26 +216,33 @@ class QueueNotificationTests(TestCase):
     @patch("ui.monitoring.monitor_queues", autospec=True)
     def test_get_queue_info(self, mock_monitor_queues):
         mock_monitor_queues.return_value = ({'Twitter Rest Harvester': 0, 'Web Harvester': 0, 'Flickr Harvester': 0,
-                                            'Tumblr Harvester': 0, 'Twitter Harvester': 0, 'Weibo Harvester': 0},
-                                           {'Weibo Exporter': 0, 'Twitter Stream Exporter': 0,
-                                            'Twitter Rest Exporter': 0, 'Tumblr Exporter': 0, 'Flickr Exporter': 0})
+                                             'Tumblr Harvester': 0, 'Twitter Harvester': 0, 'Weibo Harvester': 0},
+                                            {'Weibo Exporter': 0, 'Twitter Stream Exporter': 0,
+                                             'Twitter Rest Exporter': 0, 'Tumblr Exporter': 0, 'Flickr Exporter': 0},
+                                            {'Sfm Ui': 0})
 
         msg_cache = {}
-        get_queue_data(msg_cache)
+        queue_th_map = {'Twitter Rest Harvester': '20', 'Web Harvester': '10'}
+        queue_th_other = '10'
+        get_queue_data(msg_cache, queue_th_map, queue_th_other)
         self.assertEqual([], msg_cache['queue_data'])
         self.assertFalse(msg_cache['send_email'])
 
     @patch("ui.monitoring.monitor_queues", autospec=True)
     def test_get_queue_info_full(self, mock_monitor_queues):
         mock_monitor_queues.return_value = ({'Twitter Rest Harvester': 100, 'Web Harvester': 50, 'Flickr Harvester': 0,
-                                            'Tumblr Harvester': 200, 'Twitter Harvester': 0, 'Weibo Harvester': 0},
-                                           {'Weibo Exporter': 0, 'Twitter Stream Exporter': 10,
-                                            'Twitter Rest Exporter': 100, 'Tumblr Exporter': 0, 'Flickr Exporter': 0})
+                                             'Tumblr Harvester': 200, 'Twitter Harvester': 0, 'Weibo Harvester': 0},
+                                            {'Weibo Exporter': 0, 'Twitter Stream Exporter': 5,
+                                             'Twitter Rest Exporter': 100, 'Tumblr Exporter': 0, 'Flickr Exporter': 0},
+                                            {'Sfm Ui': 25})
 
         msg_cache = {}
-        get_queue_data(msg_cache)
+        queue_th_map = {'Twitter Rest Harvester': '20', 'Web Harvester': '25', 'Sfm Ui': '15'}
+        queue_th_other = '10'
+        get_queue_data(msg_cache, queue_th_map, queue_th_other)
         self.assertEqual(
-            [('Twitter Rest Harvester', 100), ('Tumblr Harvester', 200), ('Twitter Rest Exporter', 100)],
+            [('Twitter Rest Harvester', 100), ('Web Harvester', 50), ('Tumblr Harvester', 200),
+             ('Twitter Rest Exporter', 100), ('Sfm Ui', 25)],
             msg_cache['queue_data'])
         self.assertTrue(msg_cache['send_email'])
 

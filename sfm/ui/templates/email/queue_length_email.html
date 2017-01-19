@@ -1,7 +1,7 @@
 {% load humanize %}
 <html>
 <body>
-<p>The following message queues on your <a href="{{ url }}">Social Feed Manager</a> server reach the warning level with <strong>{{ queue_threshold }}</strong> requests. </p>
+<p>The following message queues on your <a href="{{ url }}">Social Feed Manager</a> server have reached the warning level. </p>
 <div class="panel-body">
     <table class="table">
         {% for queue, msgcount in queue_data %}

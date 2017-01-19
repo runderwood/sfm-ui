@@ -738,5 +738,5 @@ class MonitorView(LoginRequiredMixin, TemplateView):
         context = super(MonitorView, self).get_context_data(**kwargs)
         context['harvests'] = monitor_harvests()
         context['exports'] = monitor_exports()
-        context["harvester_queues"], context["exporter_queues"] = monitor_queues()
+        context["harvester_queues"], context["exporter_queues"], _ = monitor_queues()
         return context

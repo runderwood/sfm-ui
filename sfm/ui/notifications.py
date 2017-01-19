@@ -172,11 +172,11 @@ def _create_space_email(email_address, msg_cache):
     return msg
 
 
-def get_queue_data(msg_cache):
-    hqs, eqs = ui.monitoring.monitor_queues()
-    msg_cache['queue_threshold'] = int(settings.QUEUE_LENGTH_THRESHOLD)
+def get_queue_data(msg_cache, q_th_map, q_th_other):
+    hqs, eqs, uqs = ui.monitoring.monitor_queues()
     # filter any msg count larger than the threshold
-    msg_cache['queue_data'] = filter(lambda x: x[1] >= int(msg_cache['queue_threshold']), hqs.items() + eqs.items())
+    msg_cache['queue_data'] = filter(lambda x: x[1] >= int(q_th_map[x[0]] if x[0] in q_th_map else q_th_other),
+                                     hqs.items() + eqs.items() + uqs.items())
     # determine whether to send email
     msg_cache['send_email'] = len(msg_cache['queue_data'])
 
@@ -187,7 +187,9 @@ def send_queue_warn_emails():
         'send_email': False
     }
     # get queue data and determine whether to send email
-    get_queue_data(msg_cache)
+    queue_threshold_map = settings.QUEUE_LENGTH_THRESHOLD
+    queue_threshold_other = settings.QUEUE_LENGTH_THRESHOLD_OTHER
+    get_queue_data(msg_cache, queue_threshold_map, queue_threshold_other)
 
     if msg_cache['send_email']:
         email_addresses = get_admin_email_addresses()
@@ -208,7 +210,7 @@ def _create_queue_warn_email(email_address, msg_cache):
     msg_cache["url"] = _create_url(reverse('home'))
     msg_cache["monitor_url"] = _create_url(reverse('monitor'))
     d = Context(msg_cache)
-    msg = EmailMultiAlternatives("[WARNING] Long queue message on SFM server",
+    msg = EmailMultiAlternatives("[WARNING] Long message queue on SFM server",
                                  text_template.render(d), settings.EMAIL_HOST_USER, [email_address])
     msg.attach_alternative(html_template.render(d), "text/html")
     return msg

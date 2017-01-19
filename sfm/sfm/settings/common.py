@@ -213,8 +213,23 @@ PROCESSING_THRESHOLD = env.get('PROCESSING_VOLUME_THRESHOLD', '10GB')
 PERFORM_MONITOR_QUEUE = env.get('SFM_PERFORM_MONITOR_QUEUE', 'True') == 'True'
 # frequency to check the queue message length,default is 2 hour
 MONITOR_QUEUE_HOUR = env.get('SFM_MONITOR_QUEUE_HOUR', '2')
-# queue threshold to send warning message
-QUEUE_LENGTH_THRESHOLD = env.get('QUEUE_LENGTH_THRESHOLD', '100')
+# queue threshold for each harvester to send warning message
+QUEUE_LENGTH_THRESHOLD = {
+    'Web Harvester': env.get('WEB_QUEUE_LENGTH_THRESHOLD', '10')
+    # 'Twitter Rest Harvester': '33',
+    # 'Flickr Harvester': '20',
+    # 'Tumblr Harvester': '30',
+    # 'Twitter Harvester': '20',
+    # 'Weibo Harvester': '30',
+    # 'Weibo Exporter': '40',
+    # 'Twitter Stream Exporter': '10',
+    # 'Twitter Rest Exporter': '50',
+    # 'Tumblr Exporter': '60',
+    # 'Flickr Exporter': '70',
+    # 'Sfm Ui':'10'
+}
+# other harvester not setting in above map, the default value will be 10
+QUEUE_LENGTH_THRESHOLD_OTHER = env.get('QUEUE_LENGTH_THRESHOLD_OTHER', '10')
 
 # Temporarily disabling scheduled serialization due to https://github.com/gwu-libraries/sfm-ui/issues/532.
 PERFORM_SERIALIZE = env.get('SFM_PERFORM_SERIALIZE', 'True') == 'True'
